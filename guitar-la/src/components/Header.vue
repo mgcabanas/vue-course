@@ -1,17 +1,32 @@
 <script setup>
-import { inject } from 'vue';
-import Carrito from './Carrito.vue';
+import {  computed, ref, watch  } from 'vue';
 
-const guitarras = inject('guitarras');
-const guitarra = guitarras.value.find(guitarra => guitarra.id === 4);  
+const props = defineProps({
+    guitarras: {type: Object, required: true},
+    carrito: {type: Object, required: true}
+})
 
-const agregarGuitarra = () => {
-    guitarras.value.forEach(_guitarra => {
-        if(_guitarra.id === guitarra.id) {
-            _guitarra.cantidad = 1;
-        }
-    });
+defineEmits(['agregar-carrito', 'eliminar-carrito', 'vaciar-carrito']);
+
+const guitarra = props.guitarras.find(guitarra => guitarra.id === 4); 
+const estado = ref('El carrito está vacío');
+
+const total = computed(() => {
+    return props.carrito.reduce((acc, guitarra) => acc + (guitarra.precio * guitarra.cantidad), 0);
+})
+
+const actualizarEstado = () => {
+    if(props.carrito.length > 0) {
+        estado.value = 'Guitarras agregadas al carrito';
+    } else {
+        estado.value = 'El carrito está vacío';
+    }
 }
+
+watch(total, () => {
+    actualizarEstado();
+})
+
 
 </script>
 
@@ -25,7 +40,44 @@ const agregarGuitarra = () => {
                     </a>
                 </div>
                 <nav class="col-md-6 a mt-5 d-flex align-items-start justify-content-end">
-                    <Carrito/>
+                    <div class="carrito">
+                        <img class="img-fluid" src="/img/carrito.png" alt="imagen carrito" />
+
+                        <div id="carrito" class="bg-white p-3">
+                            <p class="text-center m-0">{{ estado }}</p>
+                            <table v-if="carrito.length > 0" class="w-100 table">
+                                <thead>
+                                    <tr>
+                                        <th>Imagen</th>
+                                        <th>Nombre</th>
+                                        <th>Precio</th>
+                                        <th>Cantidad</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="guitarra in carrito">
+                                        <td>
+                                            <img class="img-fluid" :src="`/img/${guitarra.imagen}.jpg`" alt="imagen guitarra">
+                                        </td>
+                                        <td>{{ guitarra.nombre }}</td>
+                                        <td class="fw-bold">{{ `$${guitarra.precio}` }}</td>
+                                        <td class="flex align-items-start gap-4">
+                                            <button type="button" class="btn btn-dark" @click="guitarra.cantidad > 1 ? guitarra.cantidad-- : guitarra.cantidad"> - </button>
+                                            {{ guitarra.cantidad }}
+                                            <button type="button" class="btn btn-dark" @click="guitarra.cantidad++"> + </button>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-danger" type="button" @click="$emit('eliminar-carrito', guitarra)"> X </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <p v-if="carrito.length > 0" class="text-end">Total pagar: <span class="fw-bold">${{ total }}</span></p>
+                            <button v-if="carrito.length > 0" class="btn btn-dark w-100 mt-3 p-2" @click="$emit('vaciar-carrito')">Vaciar Carrito</button>
+                        </div>
+                    </div>
                 </nav>
             </div><!--.row-->
 
@@ -34,7 +86,7 @@ const agregarGuitarra = () => {
                     <h1 class="display-2 fw-bold">Modelo {{ guitarra.nombre }}</h1>
                     <p class="mt-5 fs-5 text-white">{{ guitarra.descripcion }}</p>
                     <p class="text-primary fs-1 fw-black">${{ guitarra.precio }}</p>
-                    <button type="button" class="btn fs-4 bg-primary text-white py-2 px-5" @click="agregarGuitarra">Agregar al Carrito</button>
+                    <button type="button" class="btn fs-4 bg-primary text-white py-2 px-5" @click="$emit('agregar-carrito', guitarra)">Agregar al Carrito</button>
                 </div>
             </div>
         </div>

@@ -1,11 +1,11 @@
 <script setup>
-import { provide, ref } from 'vue';
+import { ref, provide } from 'vue';
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue';
 import Guitar from './components/Guitar.vue';
 import {db} from './assets/data/guitarras.js';
 
-const datosMapeados = db.map((guitarra) => {
+const guitarras = ref(db.map((guitarra) => {
     return {
         id: guitarra.id,
         nombre: guitarra.nombre,
@@ -14,21 +14,38 @@ const datosMapeados = db.map((guitarra) => {
         imagen: guitarra.imagen,
         cantidad: 0,
     }
-})
-const guitarras = ref(datosMapeados);
+}));
+const carrito = ref([]);
 
-provide('guitarras', guitarras);
+const agregarCarrito = (guitarra) => {
+    const guitarraEnCarrito = carrito.value.find(_guitarra => _guitarra.id === guitarra.id);
+    if(!guitarraEnCarrito)
+        carrito.value.push({...guitarra, cantidad: 1}) 
+}
+
+const eliminarCarrito = (guitarra) => {
+    carrito.value = carrito.value.filter(_guitarra => _guitarra.id !== guitarra.id);
+}
+
+const vaciarCarrito = () => {
+    carrito.value = [];
+}
 
 </script>
 
 <template>
-<Header />
+<Header :guitarras="guitarras" 
+        :carrito="carrito" 
+        @agregar-carrito="agregarCarrito" 
+        @eliminar-carrito="eliminarCarrito" 
+        @vaciar-carrito="vaciarCarrito"
+/>
 
 <main class="container-xl mt-5">
   <h2 class="text-center">Nuestra Colección</h2>
 
   <div class="row mt-5">
-      <Guitar v-for="guitarra in guitarras" :guitarra="guitarra" />
+      <Guitar v-for="guitarra in guitarras" :guitarra="guitarra" @agregar-carrito="agregarCarrito"/>
   </div>
 </main>
 
