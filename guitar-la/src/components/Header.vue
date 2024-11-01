@@ -1,20 +1,18 @@
 <script setup>
+import { inject } from 'vue';
 import Carrito from './Carrito.vue';
 
-const guitarras = [
-    {
-        img: '/img/guitarra_01.jpg',
-        nombre: 'Lukather',
-        precio: 299,
-        cantidad: 2
-    },
-    {
-        img: '/img/guitarra_02.jpg',
-        nombre: 'SRV',
-        precio: 299,
-        cantidad: 1
-    },
-]
+const guitarras = inject('guitarras');
+const guitarra = guitarras.value.find(guitarra => guitarra.id === 4);  
+
+const agregarGuitarra = () => {
+    guitarras.value.forEach(_guitarra => {
+        if(_guitarra.id === guitarra.id) {
+            _guitarra.cantidad = 1;
+        }
+    });
+}
+
 </script>
 
 <template>
@@ -27,19 +25,16 @@ const guitarras = [
                     </a>
                 </div>
                 <nav class="col-md-6 a mt-5 d-flex align-items-start justify-content-end">
-                    <Carrito :guitarras="guitarras"/>
+                    <Carrito/>
                 </nav>
             </div><!--.row-->
 
             <div class="row mt-5">
                 <div class="col-md-6 text-center text-md-start pt-5">
-                    <h1 class="display-2 fw-bold">Modelo VAI</h1>
-                    <p class="mt-5 fs-5 text-white">Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus, possimus quibusdam dolor nemo velit quo, fuga omnis, iure molestias optio tempore sint at ipsa dolorum odio exercitationem eos inventore odit.</p>
-                    <p class="text-primary fs-1 fw-black">$399</p>
-                    <button 
-                        type="button"
-                        class="btn fs-4 bg-primary text-white py-2 px-5"
-                    >Agregar al Carrito</button>
+                    <h1 class="display-2 fw-bold">Modelo {{ guitarra.nombre }}</h1>
+                    <p class="mt-5 fs-5 text-white">{{ guitarra.descripcion }}</p>
+                    <p class="text-primary fs-1 fw-black">${{ guitarra.precio }}</p>
+                    <button type="button" class="btn fs-4 bg-primary text-white py-2 px-5" @click="agregarGuitarra">Agregar al Carrito</button>
                 </div>
             </div>
         </div>
