@@ -6,7 +6,7 @@ const props = defineProps({
     carrito: {type: Object, required: true}
 })
 
-defineEmits(['agregar-carrito', 'eliminar-carrito', 'vaciar-carrito']);
+defineEmits(['agregar-en-carrito', 'eliminar-carrito', 'vaciar-carrito']);
 
 const guitarra = props.guitarras.find(guitarra => guitarra.id === 4); 
 const estado = ref('El carrito está vacío');
@@ -86,7 +86,7 @@ watch(total, () => {
                     <h1 class="display-2 fw-bold">Modelo {{ guitarra.nombre }}</h1>
                     <p class="mt-5 fs-5 text-white">{{ guitarra.descripcion }}</p>
                     <p class="text-primary fs-1 fw-black">${{ guitarra.precio }}</p>
-                    <button type="button" class="btn fs-4 bg-primary text-white py-2 px-5" @click="$emit('agregar-carrito', guitarra)">Agregar al Carrito</button>
+                    <button type="button" class="btn fs-4 bg-primary text-white py-2 px-5" @click="$emit('agregar-en-carrito', guitarra)">Agregar al Carrito</button>
                 </div>
             </div>
         </div>
